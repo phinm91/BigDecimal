@@ -435,7 +435,7 @@ extension BigDecimal {
         if x.isZero {
             if y.isZero { return one }
             return zero
-        }
+        } 
 
         // TODO optimize y=0, y=1, y=10^k, y=-1, y=-10^k
 
@@ -446,6 +446,9 @@ extension BigDecimal {
             } else {
                 return powInteger(x, y, mc)
             }
+        } else {
+            //Số mũ không nguyên của 1 số âm thì không thể tính được, đừng cho vào hàm log.
+            if x.isNegative { return nan }
         }
 
         // x^y = exp(y*log(x))
