@@ -1330,7 +1330,7 @@ extension BigDecimal {
         // detect nan, snan, and inf
         if sl.hasPrefix("nan") {
             sl.removeFirst(3)
-//            Self.nanFlag = true // set flag
+            Self.nanFlag = true
             if let payload = Int(sl) {
                 return Self(sign == .minus ? .nanNeg : .nanPos, payload)
             }
