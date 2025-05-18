@@ -28,7 +28,7 @@ class TestDecimal128Encoding: XCTestCase {
         let b = BInt(s, radix: 16)!
         let lo = b.words[0]
         let hi = b.words.count == 1 ? 0 : b.words[1]
-        return UInt128(high: UInt128.High(hi), low: UInt128.Low(lo))
+        return UInt128((high: UInt64(hi), low: UInt64(lo)))
     }
 
     struct test {

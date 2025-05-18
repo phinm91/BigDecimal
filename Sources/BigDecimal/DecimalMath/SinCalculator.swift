@@ -17,11 +17,11 @@ import BigInt
  * No argument checking or optimizations are done.
  * This implementation is **not** intended to be called directly.
  */
-public struct SinCalculator : SeriesCalculator {
+public struct SinCalculator : SeriesCalculator, Sendable {
     public var calculateInPairs: Bool
     public var factors: [BigRational]
     
-    static var instance = SinCalculator()
+    static let instance = SinCalculator()
     
     private var n = 0
     private var negative = false

@@ -18,11 +18,11 @@ import BigInt
  * No argument checking or optimizations are done.
  * This implementation is **not** intended to be called directly.
  */
-public struct CoshCalculator : SeriesCalculator {
+public struct CoshCalculator : SeriesCalculator, Sendable {
     public var calculateInPairs: Bool
     public var factors: [BigRational]
     
-    static var instance = CoshCalculator()
+    static let instance = CoshCalculator()
     
     private var n = 0
     private var factorial2n = BigRational.ONE

@@ -145,7 +145,7 @@ final class TestInfinityNaN: XCTestCase {
         for t in testsMul {
             XCTAssertEqual((BigDecimal(t.x) * BigDecimal(t.y)).asString(), t.result)
         }
-        XCTAssertTrue(BigDecimal.nanFlag)
+       XCTAssertTrue(BigDecimal.nanFlag)
     }
 
     let testsDiv: [test] = [

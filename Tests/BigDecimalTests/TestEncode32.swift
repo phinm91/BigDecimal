@@ -16,7 +16,7 @@ import XCTest
 final class TestEncode32: XCTestCase {
 
     override func setUpWithError() throws {
-        BigDecimal.nanFlag = false
+         BigDecimal.nanFlag = false
     }
 
     static func U32(_ x: String) -> UInt32 {

@@ -19,7 +19,7 @@ class TestRoundMul: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        XCTAssertFalse(BigDecimal.nanFlag)
+       XCTAssertFalse(BigDecimal.nanFlag)
     }
 
     struct test {

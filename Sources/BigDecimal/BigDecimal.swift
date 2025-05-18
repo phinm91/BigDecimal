@@ -7,7 +7,7 @@
 
 import Foundation   // For Data/Decimal data types
 import BigInt       // Basis for digit storage and conversions
-import UInt128      // For UInt128 data type
+import UInt128
 
 public typealias Sign = FloatingPointSign
 
@@ -20,12 +20,12 @@ public typealias Sign = FloatingPointSign
 /// There are three special ``BigDecimal`` values: ``nan`` designating
 /// Not a Number, ``infinity`` designating Infinity, ``signalingNaN``
 /// designating a Signaling Not a Number.
-public struct BigDecimal : Comparable, Equatable, Hashable, Codable {
+public struct BigDecimal : Comparable, Equatable, Hashable, Codable, Sendable {
     
     // MARK: - Constants
     
     public static let maxExp = 9_999_999_999
-    public static let maxDigits = 200        // can be changed by recompiling
+    public static let maxDigits = 200       // can be changed by recompiling
     
     /// BigDecimal(0)
     public static let zero = Self(0)
@@ -44,6 +44,10 @@ public struct BigDecimal : Comparable, Equatable, Hashable, Codable {
     
     /// BigDecimal('sNaN')
     public static let signalingNaN = Self(.snanPos)
+    
+    /// NaN flag - set to *true* whenever a NaN value is generated
+    /// Can be set to *false* by application code
+    nonisolated(unsafe) public static var nanFlag = false
     
     // MARK: - Special encodings for infinite, NaN, sNaN, and negative zero.
     
@@ -170,7 +174,7 @@ public struct BigDecimal : Comparable, Equatable, Hashable, Codable {
     ///
     /// - Parameters:
     ///   - value: The Decimal value
-    public init(_ value: Decimal) {
+    public init(_ value: Foundation.Decimal) {
         
         var m = BInt(0)
         
@@ -249,13 +253,12 @@ extension BigDecimal : Strideable {
 }
 
 extension BigDecimal : ExpressibleByIntegerLiteral {
-//    public init(integerLiteral value: StaticBigInt) {
-//        let bint = BInt(integerLiteral: value)
-//        self = Self(bint)
-//    }
-    public init(integerLiteral value: Int) {
-        self.init(value)
+    
+    public init(integerLiteral value: StaticBigInt) {
+        self = Self(BInt(integerLiteral: value))
     }
+    
+    public typealias IntegerLiteralType = StaticBigInt
 }
 
 extension BigDecimal : SignedNumeric {
@@ -353,7 +356,7 @@ extension BigDecimal : FloatingPoint {
     // MARK: - FloatingPoint Static Properties
     
     // Default precision and rounding same as Decimal128
-    public static var mc = Rounding.decimal128
+    public static let mc = Rounding.decimal128
     
     public static var radix: Int     { 10 }
     public static var pi: Self       { Self.pi(mc) }
@@ -599,12 +602,6 @@ extension BigDecimal {
         self.isFinite ? Self(BInt.ONE, self.exponent) : Self.flagNaN()
     }
 
-    
-    // MARK: Static variables
-
-    /// NaN flag - set to *true* whenever a NaN value is generated
-    /// Can be set to *false* by application code
-    public static var nanFlag = false
 
     // MARK: Conversion functions
     
@@ -739,13 +736,13 @@ extension BigDecimal {
     /// *self* as a Decimal (the Swift Foundation type)
     ///
     /// - Returns: *self* as a Decimal value
-    public func asDecimal() -> Decimal {
+    public func asDecimal() -> Foundation.Decimal {
         let maxExp = 127
         let minExp = -128
         let maxDec = Self(BInt("ffffffffffffffffffffffffffffffff", radix:16)!, maxExp)
         
         if self.isNaN || self.abs > maxDec {
-            return Decimal.nan
+            return Foundation.Decimal.nan
         }
         var exp = self.exponent
         var sig = self.digits.abs
@@ -762,7 +759,7 @@ extension BigDecimal {
             exp = minExp
         }
         if sig == 0 {
-            return Decimal(0)
+            return Foundation.Decimal(0)
         }
         assert(sig.words.count < 3)
         assert(minExp <= exp && exp <= maxExp)
@@ -792,7 +789,7 @@ extension BigDecimal {
             length += 1
         }
         assert(sig < 0x10000)
-        return Decimal(_exponent: Int32(exp), _length: length,
+        return Foundation.Decimal(_exponent: Int32(exp), _length: length,
                        _isNegative: self < 0 ? 1 : 0, _isCompact: 0,
                        _reserved: 0, _mantissa: (s0,s1,s2,s3,s4,s5,s6,s7))
     }
@@ -1333,7 +1330,7 @@ extension BigDecimal {
         // detect nan, snan, and inf
         if sl.hasPrefix("nan") {
             sl.removeFirst(3)
-            Self.nanFlag = true // set flag
+//            Self.nanFlag = true // set flag
             if let payload = Int(sl) {
                 return Self(sign == .minus ? .nanNeg : .nanPos, payload)
             }
@@ -1416,7 +1413,7 @@ extension BigDecimal {
         return Self(w, e - scale)
     }
     
-    static func flagNaN(_ signaling:Bool=false) -> Self {
+    static func flagNaN(_ signaling: Bool = false) -> Self {
         if signaling { return Self.signalingNaN }
         Self.nanFlag = true
         return Self.nan

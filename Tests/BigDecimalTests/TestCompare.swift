@@ -15,11 +15,11 @@ import XCTest
 class TestCompare: XCTestCase {
 
     override func setUpWithError() throws {
-        BigDecimal.nanFlag = false
+       BigDecimal.nanFlag = false
     }
 
     override func tearDownWithError() throws {
-        XCTAssertFalse(BigDecimal.nanFlag)
+       XCTAssertFalse(BigDecimal.nanFlag)
     }
 
     struct test {
@@ -265,5 +265,32 @@ class TestCompare: XCTestCase {
         XCTAssertFalse(-x <= -y)
         XCTAssertTrue(-x > -y)
         XCTAssertTrue(-x >= -y)
+    }
+    
+    func test8() throws {
+        let x = BigDecimal("1")
+        let y = BigDecimal("2")
+        XCTAssertFalse(x.isEqual(to: y))
+        XCTAssertTrue(x.isLess(than: y))
+        XCTAssertTrue(x.isLessThanOrEqualTo(y))
+        
+        XCTAssertFalse((-x).isEqual(to: y))
+        XCTAssertTrue((-x).isLess(than: y))
+        XCTAssertTrue((-x).isLessThanOrEqualTo(y))
+
+        XCTAssertFalse(x.isEqual(to: -y))
+        XCTAssertFalse(x.isLess(than: -y))
+        XCTAssertFalse(x.isLessThanOrEqualTo(-y))
+        
+        XCTAssertFalse((-x).isEqual(to: -y))
+        XCTAssertFalse((-x).isLess(than: -y))
+        XCTAssertFalse((-x).isLessThanOrEqualTo(-y))
+        
+        XCTAssertFalse(x.isNaN)
+        XCTAssertFalse(x.isZero)
+        XCTAssertTrue(x.isPositive)
+        XCTAssertTrue(x.isFinite)
+        XCTAssertTrue(x.isNormal)
+        XCTAssertTrue(x.isCanonical)
     }
 }

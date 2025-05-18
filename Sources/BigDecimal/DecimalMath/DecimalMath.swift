@@ -127,7 +127,7 @@ extension BigDecimal {
         return value - integralPart(value)
     }
     
-    private static var factorialCache: [BigDecimal] = {
+    private static let factorialCache: [BigDecimal] = {
         let initialSize = 100
         var cache = [BigDecimal](); cache.reserveCapacity(initialSize)
         var result = one
@@ -139,6 +139,12 @@ extension BigDecimal {
         return cache
     }()
     
+    /**
+     * Computes an integer factorial.
+     *
+     * - Parameter n: Factorial to calculate.
+     * - Returns: The BigDecimal factorial of `n`.
+     */
     public static func factorial(_ n: Int) -> BigDecimal {
         precondition(n >= 0, "Illegal factorial(n) for n < 0: n = \(n)")
         
@@ -230,7 +236,7 @@ extension BigDecimal {
         return result.round(mc)
     }
     
-    private static var spougeFactorialConstantsCache = [Int: [BigDecimal]]()
+    nonisolated(unsafe) private static var spougeFactorialConstantsCache = [Int: [BigDecimal]]()
 
     public static func getSpougeFactorialConstants(_ a: Int) -> [BigDecimal] {
         if let constants = spougeFactorialConstantsCache[a] {
@@ -530,7 +536,7 @@ extension BigDecimal {
         return mc.round(result!)
     }
     
-    private static var piCache: BigDecimal?
+    nonisolated(unsafe) private static var piCache: BigDecimal?
     
     private static func piChudnovski(_ mc: Rounding) -> Self {
         let mc2 = Rounding(mc.mode, mc.precision + 10)
@@ -614,7 +620,8 @@ extension BigDecimal {
         let mc2 = Rounding(mc.mode, mc.precision + 6)
 
         let x = x.divide(256, mc2)
-        var result = ExpCalculator.instance.calculate(x, mc2)
+        var expCalc = ExpCalculator.instance
+        var result = expCalc.calculate(x, mc2)
         result = powInteger(result, 256, mc2)
         return result.round(mc)
     }
@@ -642,8 +649,8 @@ extension BigDecimal {
             x = x.quotientAndRemainder(twoPi).remainder
         }
 
-        let result = SinCalculator.instance.calculate(x, mc2);
-        return result.round(mc)
+        var result = SinCalculator.instance
+        return result.calculate(x, mc2).round(mc)
     }
     
     /**
@@ -675,8 +682,8 @@ extension BigDecimal {
             return acos(xTransformed, mc)
         }
 
-        let result = AsinCalculator.instance.calculate(x, mc)
-        return result.round(mc)
+        var result = AsinCalculator.instance
+        return result.calculate(x, mc).round(mc)
     }
     
     /**
@@ -702,8 +709,8 @@ extension BigDecimal {
             x = x.quotientAndRemainder(twoPi).remainder
         }
         
-        let result = CosCalculator.instance.calculate(x, mc2)
-        return result.round(mc)
+        var result = CosCalculator.instance
+        return result.calculate(x, mc2).round(mc)
     }
 
     /**
@@ -873,8 +880,8 @@ extension BigDecimal {
      */
     public static func sinh(_ x:Self, _ mc:Rounding) -> Self {
         let mc2 = Rounding(mc.mode, mc.precision + 4)
-        let result = SinhCalculator.instance.calculate(x, mc2);
-        return result.round(mc)
+        var result = SinhCalculator.instance
+        return result.calculate(x, mc2).round(mc)
     }
 
     /**
@@ -892,8 +899,8 @@ extension BigDecimal {
      */
     public static func cosh(_ x:Self, _ mc:Rounding) -> Self {
         let mc2 = Rounding(mc.mode, mc.precision + 4)
-        let result = CoshCalculator.instance.calculate(x, mc2)
-        return result.round(mc)
+        var result = CoshCalculator.instance
+        return result.calculate(x, mc2).round(mc)
     }
 
     /**
@@ -1240,7 +1247,7 @@ extension BigDecimal {
         return result
     }
     
-    private static var log2Cache: BigDecimal?
+    nonisolated(unsafe) private static var log2Cache: BigDecimal?
     private static func logTwo(_ mc: Rounding) -> Self {
         if let result = log2Cache, mc.precision <= result.precision {
             return result.round(mc)
@@ -1250,7 +1257,7 @@ extension BigDecimal {
         }
     }
     
-    private static var log3Cache: BigDecimal?
+    nonisolated(unsafe) private static var log3Cache: BigDecimal?
     private static func logThree(_ mc: Rounding) -> Self {
         if let result = log3Cache, mc.precision <= result.precision {
             return result.round(mc)
@@ -1260,7 +1267,7 @@ extension BigDecimal {
         }
     }
     
-    private static var log10Cache: BigDecimal?
+    nonisolated(unsafe) private static var log10Cache: BigDecimal?
     private static func logTen(_ mc: Rounding) -> Self {
         if let result = log10Cache, mc.precision <= result.precision {
             return result.round(mc)

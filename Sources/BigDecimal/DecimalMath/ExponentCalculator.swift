@@ -17,8 +17,8 @@ import BigInt
  * No argument checking or optimizations are done.
  * This implementation is **not** intended to be called directly.
  */
-public struct ExpCalculator : SeriesCalculator {    
-    public static var instance = ExpCalculator()
+public struct ExpCalculator : SeriesCalculator, Sendable {    
+    public static let instance = ExpCalculator()
     
     public var calculateInPairs: Bool
     public var factors = [BigInt.BFraction]()

@@ -17,7 +17,7 @@ class TestAbs: XCTestCase {
     override func setUpWithError() throws {
         BigDecimal.nanFlag = false
     }
-
+    
     override func tearDownWithError() throws {
         XCTAssertFalse(BigDecimal.nanFlag)
     }
